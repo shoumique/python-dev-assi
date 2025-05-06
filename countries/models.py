@@ -4,7 +4,7 @@ class Country(models.Model):
     name_common = models.CharField(max_length=255)
     name_official = models.CharField(max_length=255)
     cca2 = models.CharField(max_length=2)
-    cca3 = models.CharField(max_length=3)
+    cca3 = models.CharField(max_length=3, unique=True)
     ccn3 = models.CharField(max_length=3)
     cioc = models.CharField(max_length=3)
     flag = models.URLField()
