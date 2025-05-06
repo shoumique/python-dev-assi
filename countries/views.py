@@ -5,3 +5,8 @@ from .serializers import CountrySerializer
 class CountryListView(generics.ListAPIView):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
+
+class CountryDetailView(generics.RetrieveAPIView):
+    queryset = Country.objects.all()
+    serializer_class = CountrySerializer
+    lookup_field = 'cca3'  # or 'cca3' if preferred
