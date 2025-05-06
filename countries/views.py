@@ -5,6 +5,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import filters
 
+from django.shortcuts import render
+
+
 class CountryListCreateView(generics.ListCreateAPIView):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
@@ -34,3 +37,29 @@ class CountrySearchView(generics.ListAPIView):
     def get_queryset(self):
         return Country.objects.all()
         
+
+
+
+
+def country_list(request):
+    query = request.GET.get('q')
+    if query:
+        countries = Country.objects.filter(name_common__icontains=query)
+    else:
+        countries = Country.objects.all()
+    return render(request, 'countries/country_list.html', {'countries': countries})
+
+
+def country_detail(request, country_id):
+    country = Country.objects.get(id=country_id)
+    same_region = Country.objects.filter(region=country.region).exclude(id=country.id)
+    languages = country.languages.values() if isinstance(country.languages, dict) else []
+
+    print(same_region)
+    print(languages)
+
+    return render(request, 'countries/country_detail.html', {
+        'country': country,
+        'same_region': same_region,
+        'languages': languages
+    })
