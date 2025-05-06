@@ -19,3 +19,9 @@ class SameRegionCountriesView(APIView):
         serializer = CountrySerializer(countries, many=True)
         return Response(serializer.data)
     
+class SameLanguageCountriesView(APIView):
+    def get(self, request, language_code):
+        countries = Country.objects.filter(languages__has_key=language_code)
+        serializer = CountrySerializer(countries, many=True)
+        return Response(serializer.data)
+    
