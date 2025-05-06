@@ -1,35 +1,51 @@
-from rest_framework import generics
+from rest_framework import generics, filters
 from .models import Country
 from .serializers import CountrySerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import filters
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 
 from django.shortcuts import render
-
+from django.contrib.auth.decorators import login_required
 
 class CountryListCreateView(generics.ListCreateAPIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
 
 class CountryDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
     lookup_field = 'cca3'
 
 class SameRegionCountriesView(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, region):
         countries = Country.objects.filter(region__iexact=region)
         serializer = CountrySerializer(countries, many=True)
         return Response(serializer.data)
     
 class SameLanguageCountriesView(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, language_code):
         countries = Country.objects.filter(languages__has_key=language_code)
         serializer = CountrySerializer(countries, many=True)
         return Response(serializer.data)
     
 class CountrySearchView(generics.ListAPIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
     serializer_class = CountrySerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['name_common', 'name_official']
@@ -40,7 +56,7 @@ class CountrySearchView(generics.ListAPIView):
 
 
 
-
+@login_required
 def country_list(request):
     query = request.GET.get('q')
     if query:
@@ -50,6 +66,7 @@ def country_list(request):
     return render(request, 'countries/country_list.html', {'countries': countries})
 
 
+@login_required
 def country_detail(request, country_id):
     country = Country.objects.get(id=country_id)
     same_region = Country.objects.filter(region=country.region).exclude(id=country.id)
