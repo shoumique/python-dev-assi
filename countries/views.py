@@ -3,6 +3,7 @@ from .models import Country
 from .serializers import CountrySerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import filters
 
 class CountryListCreateView(generics.ListCreateAPIView):
     queryset = Country.objects.all()
@@ -25,3 +26,11 @@ class SameLanguageCountriesView(APIView):
         serializer = CountrySerializer(countries, many=True)
         return Response(serializer.data)
     
+class CountrySearchView(generics.ListAPIView):
+    serializer_class = CountrySerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name_common', 'name_official']
+
+    def get_queryset(self):
+        return Country.objects.all()
+        
